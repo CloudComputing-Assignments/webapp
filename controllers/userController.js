@@ -1,5 +1,4 @@
 const userService = require("../services/userService");
-const healthzController = require("../controllers/healthzController");
 const healthzService = require("../services/healthzService");
 
 async function getUser(req, res) {
@@ -27,7 +26,7 @@ async function getUser(req, res) {
     res.set({
       "Access-Control-Allow-Credentials": "true",
       "Access-Control-Allow-Headers":
-        "X-Requested-With, Content-Type, Accept, Origin",
+      "X-Requested-With, Content-Type, Accept, Origin",
       "Access-Control-Allow-Methods": "*",
       "Access-Control-Allow-Origin": "*",
       "Cache-Control": "no-cache",
@@ -103,35 +102,65 @@ async function createUser(req, res) {
 }
 
 async function updateUser(req, res) {
+  console.log("reached function");
+
   try {
+    // Check database connection
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
+    if (!isDatabaseConnected) {
+      return res.status(503).header("Cache-Control", "no-cache").send();
+    }
   } catch (error) {
     console.error("Error checking database connection:", error);
     return res.status(503).header("Cache-Control", "no-cache").send();
   }
-  try {
-    if (Object.keys(req.body).length !== 3) {
-      res.status(400).header("Cache-Control", "no-cache").send();
-      return;
-    }
-    const updatedFields = Object.keys(req.body);
-    const allowedFields = ["first_name", "last_name", "password"];
 
-    if (!updatedFields.every((field) => allowedFields.includes(field))) {
-      return res.status(400).send();
+  try {
+    // Validate the request body
+    const validationResult = validateRequestBody(req.body);
+    if (!validationResult.isValid) {
+      return res.status(400).header("Cache-Control", "no-cache").send();
     }
+
     const authHeader = req.headers.authorization;
     const { first_name, last_name, password } = req.body;
+
+    // Call the user service to update the user
     const updatedUser = await userService.updateUser(
       authHeader,
       first_name,
       last_name,
       password
     );
-    res.status(204).send();
+
+    // Send a no-content response if the update is successful
+    return res.status(204).send(); // 204 No Content indicates success with no response body
   } catch (error) {
-    res.status(400).send();
+    console.log("An error occurred while updating the user:", error);
+    return res.status(400).header("Cache-Control", "no-cache").send(); // Generic 400 for any error
   }
 }
+
+// Function to validate request body
+function validateRequestBody(body) {
+  const allowedFields = ["first_name", "last_name", "password"];
+  const updatedFields = Object.keys(body);
+
+  if (updatedFields.length !== 3) {
+    return { isValid: false };
+  }
+
+  if (!updatedFields.every((field) => allowedFields.includes(field))) {
+    return { isValid: false };
+  }
+
+  // Additional validation for non-empty fields
+  if (!body.first_name.trim() || !body.last_name.trim() || !body.password.trim()) {
+    return { isValid: false };
+  }
+
+  return { isValid: true };
+}
+
 
 module.exports = { getUser, createUser, updateUser };
