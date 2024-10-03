@@ -50,7 +50,7 @@ const User = sequelize.define(
       },
       writeOnly: true,
     },
-    username: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,

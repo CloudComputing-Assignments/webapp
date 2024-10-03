@@ -9,11 +9,9 @@ const { handleSyntaxError } = require('./middleware/middleware');
 const { sequelize } = require('./config/config'); // Adjust the path as necessary
 
 sequelize.sync({ force: false })
-  .then(() => {
-    console.log('Database & tables created!');
-  })
   .catch((error) => {
-    console.error('Error creating database tables:', error);
+    // Handle the error (optional: rethrow it or handle appropriately)
+    throw error;
   });
 
 // Apply middleware
@@ -34,3 +32,5 @@ app.use(handleSyntaxError);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+module.exports = app;

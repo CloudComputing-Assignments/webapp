@@ -1,11 +1,11 @@
 const User = require('../model/User');
 
-async function createUser(first_name, last_name, password, username ) {
-    const existingUser = await User.findOne({ where: { username } });
+async function createUser(first_name, last_name, password, email ) {
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
         throw new Error('User Exists!');
     }
-    if(!first_name.trim() || !last_name.trim() || !password.trim() || !username.trim())
+    if(!first_name.trim() || !last_name.trim() || !password.trim() || !email.trim())
     {
         throw new Error('Invalid Input');
     }
@@ -14,7 +14,7 @@ async function createUser(first_name, last_name, password, username ) {
         first_name,
         last_name,
         password,
-        username,
+        email,
       });
     return newUser;
 }
@@ -23,8 +23,8 @@ async function getUser(authHeader) {
   
     const base64Credentials = authHeader.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-    const [username, password] = credentials.split(':');
-    const user = await User.findOne({ where: { username } });
+    const [email, password] = credentials.split(':');
+    const user = await User.findOne({ where: { email } });
     
     if (!user) {
     
@@ -38,11 +38,11 @@ async function getUser(authHeader) {
     return user;
   }
 
-  async function updateUser(authHeader, first_name, last_name, newpass) {
+  async function updateUser(authHeader, first_name, last_name, newpass, user_email) {
     const base64Credentials = authHeader.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-    const [username, password] = credentials.split(':');
-    const user = await User.findOne({ where: { username } });
+    const [email, password] = credentials.split(':');
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       throw new Error('User not found');
     }
@@ -50,7 +50,7 @@ async function getUser(authHeader) {
       console.log('Password)',password);
       throw new Error('Invalid password');
     }
-    if(!first_name.trim() || !last_name.trim() || !newpass.trim())
+    if(!first_name.trim() || !last_name.trim() || !newpass.trim() || !user_email.trim())
     {
       throw new Error('Invalid Input');
     }
