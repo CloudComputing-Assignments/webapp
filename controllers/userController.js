@@ -1,45 +1,90 @@
 const userService = require("../services/userService");
-const healthzController = require("../controllers/healthzController");
 const healthzService = require("../services/healthzService");
 
 async function getUser(req, res) {
   try {
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
+    if (!isDatabaseConnected) {
+      return res
+        .status(503)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
+    }
   } catch (error) {
     console.error("Error checking database connection:", error);
-    return res.status(503).header("Cache-Control", "no-cache").send();
+    return res
+      .status(503)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
+
   try {
+    // Validate that the body is empty for the GET request
     if (Object.keys(req.body).length > 0) {
-      res.status(400).header("Cache-Control", "no-cache").send();
-      return;
+      return res
+        .status(400)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
     }
+
     const authHeader = req.headers.authorization;
     const User = await userService.getUser(authHeader);
+
     const responseObject = {
       id: User.id,
       first_name: User.first_name,
       last_name: User.last_name,
-      username: User.username,
+      email: User.email,
       account_created: User.account_created.toISOString(),
       account_updated: User.account_updated.toISOString(),
     };
-    res.set({
-      "Access-Control-Allow-Credentials": "true",
-      "Access-Control-Allow-Headers":
-        "X-Requested-With, Content-Type, Accept, Origin",
-      "Access-Control-Allow-Methods": "*",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-cache",
-    });
 
-    res.status(200).json(responseObject);
+    res
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .status(200)
+      .json(responseObject);
   } catch (error) {
-    res.status(401).send();
+    console.error("Error fetching user:", error);
+    return res
+      .status(401)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
 }
 
+
 async function createUser(req, res) {
+
   try {
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
   } catch (error) {
@@ -65,24 +110,24 @@ async function createUser(req, res) {
     }
 
     const updatedFields = Object.keys(req.body);
-    const allowedFields = ["first_name", "last_name", "password", "username"];
+    const allowedFields = ["first_name", "last_name", "password", "email"];
 
     if (!updatedFields.every((field) => allowedFields.includes(field))) {
       return res.status(400).send();
     }
-    const { first_name, last_name, password, username } = req.body;
+    const { first_name, last_name, password, email } = req.body;
     const newUser = await userService.createUser(
       first_name,
       last_name,
       password, 
-      username
+      email
     );
 
     const responseObject = {
       id: newUser.id,
       first_name: newUser.first_name,
       last_name: newUser.last_name,
-      username: newUser.username,
+      email: newUser.email,
       account_created: newUser.account_created.toISOString(),
       account_updated: newUser.account_updated.toISOString(),
     };
@@ -103,35 +148,107 @@ async function createUser(req, res) {
 }
 
 async function updateUser(req, res) {
+  console.log("reached function");
   try {
+    // Check database connection
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
+    if (!isDatabaseConnected) {
+      return res
+        .status(503)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
+    }
   } catch (error) {
     console.error("Error checking database connection:", error);
-    return res.status(503).header("Cache-Control", "no-cache").send();
+    return res
+      .status(503)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
-  try {
-    if (Object.keys(req.body).length !== 3) {
-      res.status(400).header("Cache-Control", "no-cache").send();
-      return;
-    }
-    const updatedFields = Object.keys(req.body);
-    const allowedFields = ["first_name", "last_name", "password"];
 
-    if (!updatedFields.every((field) => allowedFields.includes(field))) {
-      return res.status(400).send();
+  try {
+    // Validate the request body
+    console.log("checking request body");
+    const validationResult = validateRequestBody(req.body);
+    if (!validationResult.isValid) {
+      return res
+        .status(400)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
     }
+
     const authHeader = req.headers.authorization;
-    const { first_name, last_name, password } = req.body;
-    const updatedUser = await userService.updateUser(
-      authHeader,
-      first_name,
-      last_name,
-      password
-    );
-    res.status(204).send();
+    const { first_name, last_name, password, email } = req.body; // Include email in destructuring
+
+    // Call the user service to update the user, but ignore email
+    const updatedUser = await userService.updateUser(authHeader, first_name, last_name, password, email);
+
+    // Send a no-content response if the update is successful
+    return res
+      .status(204)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   } catch (error) {
-    res.status(400).send();
+    console.error("An error occurred while updating the user:", error);
+    return res
+      .status(400)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
 }
+
+
+
+// Function to validate request body
+function validateRequestBody(body) {
+  const allowedFields = ["first_name", "last_name", "password", "email"];
+  const updatedFields = Object.keys(body);
+
+  if (updatedFields.length !== 4) {
+    return { isValid: false };
+  }
+
+  if (!updatedFields.every((field) => allowedFields.includes(field))) {
+    return { isValid: false };
+  }
+
+  // Additional validation for non-empty fields
+  if (!body.first_name.trim() || !body.last_name.trim() || !body.password.trim() || !body.email.trim()) {
+    return { isValid: false };
+  }
+
+  return { isValid: true };
+}
+
 
 module.exports = { getUser, createUser, updateUser };
