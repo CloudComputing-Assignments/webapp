@@ -4,17 +4,50 @@ const healthzService = require("../services/healthzService");
 async function getUser(req, res) {
   try {
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
+    if (!isDatabaseConnected) {
+      return res
+        .status(503)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
+    }
   } catch (error) {
     console.error("Error checking database connection:", error);
-    return res.status(503).header("Cache-Control", "no-cache").send();
+    return res
+      .status(503)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
+
   try {
+    // Validate that the body is empty for the GET request
     if (Object.keys(req.body).length > 0) {
-      res.status(400).header("Cache-Control", "no-cache").send();
-      return;
+      return res
+        .status(400)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
     }
+
     const authHeader = req.headers.authorization;
     const User = await userService.getUser(authHeader);
+
     const responseObject = {
       id: User.id,
       first_name: User.first_name,
@@ -23,22 +56,35 @@ async function getUser(req, res) {
       account_created: User.account_created.toISOString(),
       account_updated: User.account_updated.toISOString(),
     };
-    res.set({
-      "Access-Control-Allow-Credentials": "true",
-      "Access-Control-Allow-Headers":
-      "X-Requested-With, Content-Type, Accept, Origin",
-      "Access-Control-Allow-Methods": "*",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-cache",
-    });
 
-    res.status(200).json(responseObject);
+    res
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .status(200)
+      .json(responseObject);
   } catch (error) {
-    res.status(401).send();
+    console.error("Error fetching user:", error);
+    return res
+      .status(401)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
 }
 
+
 async function createUser(req, res) {
+
   try {
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
   } catch (error) {
@@ -102,44 +148,83 @@ async function createUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  console.log("reached function");
-
   try {
     // Check database connection
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
     if (!isDatabaseConnected) {
-      return res.status(503).header("Cache-Control", "no-cache").send();
+      return res
+        .status(503)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
     }
   } catch (error) {
     console.error("Error checking database connection:", error);
-    return res.status(503).header("Cache-Control", "no-cache").send();
+    return res
+      .status(503)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
 
   try {
     // Validate the request body
     const validationResult = validateRequestBody(req.body);
     if (!validationResult.isValid) {
-      return res.status(400).header("Cache-Control", "no-cache").send();
+      return res
+        .status(400)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
     }
 
     const authHeader = req.headers.authorization;
     const { first_name, last_name, password } = req.body;
 
     // Call the user service to update the user
-    const updatedUser = await userService.updateUser(
-      authHeader,
-      first_name,
-      last_name,
-      password
-    );
+    const updatedUser = await userService.updateUser(authHeader, first_name, last_name, password);
 
     // Send a no-content response if the update is successful
-    return res.status(204).send(); // 204 No Content indicates success with no response body
+    return res
+      .status(204)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   } catch (error) {
-    console.log("An error occurred while updating the user:", error);
-    return res.status(400).header("Cache-Control", "no-cache").send(); // Generic 400 for any error
+    console.error("An error occurred while updating the user:", error);
+    return res
+      .status(400)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
 }
+
 
 // Function to validate request body
 function validateRequestBody(body) {

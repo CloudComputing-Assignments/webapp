@@ -6,6 +6,10 @@ const { rejectPayloadMiddleware, rejectQueryParametersMiddleware } = require('..
 console.log('healthzRouter.js is running');
 healthzRouter.get('/', rejectPayloadMiddleware, rejectQueryParametersMiddleware, healthzController.healthz);
 
+healthzRouter.head('/', (req, res) => {
+    return res.status(405).header('Cache-Control', 'no-cache').send();
+  });
+
 healthzRouter.all('/', (req, res) => {
     return res.status(405).header('Cache-Control', 'no-cache').send();
 });
