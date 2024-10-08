@@ -1,7 +1,7 @@
 # webapp
 
-Cloud Native Webapp
-Prerequisites
+# Cloud Native Webapp
+## Prerequisites
 Before you begin, ensure you have met the following requirements:
 
 Node.js installed on your local machine (Download Node.js)
