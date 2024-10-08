@@ -1,0 +1,45 @@
+# name: Node.js CI with MySQL
+
+# on:
+#   pull_request:
+#     branches: [ "main" ]
+
+# jobs:
+#   CI:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Use Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '20'
+
+#     - name: Install MySQL
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y mysql-server
+#         sudo service mysql start
+
+#     - name: Configure MySQL
+#       run: |
+#         sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};"
+#         sudo mysql -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
+#         sudo mysql -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB_NAME }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
+#         sudo mysql -e "FLUSH PRIVILEGES;"
+
+#     - name: Configure Environment Variables
+#       run: |
+#         echo NODE_ENV=${{ secrets.ENVIRONMENT }} >> .env
+#         echo DB_HOST=localhost >> .env
+#         echo DB_USER=${{ secrets.DB_USER }} >> .env
+#         echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+#         echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+#         echo DB_PORT=3306 >> .env
+#         echo PORT=${{ secrets.PORT }} >> .env
+#         echo HOSTNAME=localhost >> .env
+    
+#     - name: Install Dependencies
+#       run: npm install
+
+#     - name: Run Tests
+#       run: npm test
