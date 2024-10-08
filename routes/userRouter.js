@@ -33,7 +33,7 @@ userRouter.use((req, res, next) => {
   
   // Handle undefined routes (return 405 for any others)
   userRouter.all('*', (req, res) => {
-    res.status(405).end();  // Set status to 405 and end response without body
+    res.status(405).end();  
   });
 
 module.exports = userRouter;
