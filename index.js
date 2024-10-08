@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const { healthz } = require('./controllers/healthzController');
 const healthzRouter = require('./routes/healthzRouter');
 const userRouter = require('./routes/userRouter');
 const app = express();
