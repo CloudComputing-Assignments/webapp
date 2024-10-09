@@ -26,6 +26,7 @@ jobs:
         echo "Database Environment is: ${{ secrets.ENVIRONMENT }}"
         echo "Data user is: ${{secrets.DB_USER}}"
         echo "Data password is: ${{secrets.DB_PASSWORD}}"
+        echo "Root password length is: ${{ secrets.DB_ROOT_PASSWORD }}"
 
     - name: Configure MySQL
       run: |
