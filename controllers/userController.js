@@ -148,7 +148,6 @@ async function createUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  console.log("reached function");
   try {
     // Check database connection
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
@@ -180,7 +179,6 @@ async function updateUser(req, res) {
 
   try {
     // Validate the request body
-    console.log("checking request body");
     const validationResult = validateRequestBody(req.body);
     if (!validationResult.isValid) {
       return res
