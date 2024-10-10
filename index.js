@@ -28,8 +28,11 @@ app.use('/v1/user', userRouter);
 app.use(handleSyntaxError);
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const startServer = () => {
+  const server = app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+  return server;
+};
 
-module.exports = app;
+module.exports = { app, startServer };
