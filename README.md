@@ -1,4 +1,3 @@
-Here’s the formatted version of the instructions:
 
 ---
 
