@@ -11,6 +11,7 @@ on:
 
 jobs:
   CI:
+    name: Node.JS CI
     runs-on: ubuntu-latest
     steps:
       - name: Install  and start MySQL
