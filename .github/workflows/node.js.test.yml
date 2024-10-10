@@ -9,44 +9,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
-    - name: Install MySQL
+    - name: Install MySQL as root
       run: |
         sudo apt-get update
         sudo apt-get install -y mysql-server
         sudo service mysql start
 
-    - name: Test Secret Access
+    - name: Connect to MySQL and create database
       run: |
-        echo "Database Name is: ${{ secrets.DB_NAME }}"
-        echo "Database Environment is: ${{ secrets.ENVIRONMENT }}"
-        echo "Data user is: ${{secrets.DB_USER}}"
-        echo "Data password is: ${{secrets.DB_PASSWORD}}"
+         mysql --host 127.0.0.1 -uroot -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
+         sudo mysql --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
 
-    - name: Configure MySQL
-      run: |
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};"
-        sudo mysql -e "CREATE USER IF NOT EXISTS '${{ secrets.DB_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}';"
-        sudo mysql -e "GRANT ALL PRIVILEGES ON ${{ secrets.DB_NAME }}.* TO '${{ secrets.DB_USER }}'@'localhost';"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-
-    - name: Configure Environment Variables
-      run: |
-        echo NODE_ENV=${{ secrets.ENVIRONMENT }} >> .env
-        echo DB_HOST=localhost >> .env
-        echo DB_USER=${{ secrets.DB_USER }} >> .env
-        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-        echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-        echo DB_PORT=3306 >> .env
-        echo PORT=${{ secrets.PORT }} >> .env
-        echo HOSTNAME=localhost >> .env
-    
     - name: Install Dependencies
-      run: npm install
+      run: sudo npm install  # Adding sudo here for root execution
 
-    - name: Run Tests
-      run: npm test
+    - name: Run Tests as root
+      run: sudo npm test  # Running tests as root
