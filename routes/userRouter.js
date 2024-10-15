@@ -8,7 +8,7 @@ userRouter.use((req, res, next) => {
     next();
   });
 
-  userRoutwer.head('*', (req, res) => {
+  userRouter.head('*', (req, res) => {
     res.status(405).end();  // Set status to 405 for HEAD requests
 });
   
