@@ -8,12 +8,12 @@ userRouter.use((req, res, next) => {
     next();
   });
 
-  userRouter.head('*', (req, res) => {
+  userRoutwer.head('*', (req, res) => {
     res.status(405).end();  // Set status to 405 for HEAD requests
 });
   
   // Define the allowed routes
-  userRouter.get('/self', userController.getUser);
+  userRouter.get('/self', userController.geser);
   userRouter.put('/self', userController.updateUser);
   userRouter.post('/', userController.createUser);
   
