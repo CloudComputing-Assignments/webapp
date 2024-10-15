@@ -13,7 +13,7 @@ userRouter.use((req, res, next) => {
 });
   
   // Define the allowed routes
-  userRouter.get('/self', userController.geser);
+  userRouter.get('/self', userController.getUser);
   userRouter.put('/self', userController.updateUser);
   userRouter.post('/', userController.createUser);
   
