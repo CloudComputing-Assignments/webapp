@@ -45,13 +45,13 @@ source "amazon-ebs" "app-image" {
   region        = var.aws_region
 
   # Specify the exact AMI ID here
-  source_ami    = "ami-0866a3c8686eaeeba"  # Replace with your actual AMI ID
+  source_ami = "ami-0866a3c8686eaeeba" # Replace with your actual AMI ID
 
-  ssh_username  = var.ssh_username
+  ssh_username = var.ssh_username
 
   # Specify VPC and subnet
-  vpc_id       = "vpc-0f2850e40f574343c"    # Replace with your actual VPC ID
-  subnet_id    = "subnet-00182ea6332d20830" # Replace with your actual Subnet ID
+  vpc_id    = "vpc-0f2850e40f574343c"    # Replace with your actual VPC ID
+  subnet_id = "subnet-00182ea6332d20830" # Replace with your actual Subnet ID
 }
 
 
