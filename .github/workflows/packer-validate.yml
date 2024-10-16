@@ -37,6 +37,9 @@ jobs:
       - name: Delete copied files
         run: rm -rf webapp && ls -R
 
+      - name: List files after deleting
+        run: ls -alh
+
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main
         id: setup
