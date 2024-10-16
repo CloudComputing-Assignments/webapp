@@ -68,8 +68,10 @@ dist
 .vscode-test
 
 # Packer specific - Exclude all packer variable files
-*.auto.pkrvars.hcl
 *.pkrvars*
+*.pkrvars.hcl
+*.auto.pkrvars.hcl
+
 
 
 # Sensitive environment files

@@ -39,19 +39,39 @@ variable "DB_PASSWORD" {
   type = string
 }
 
+variable "aws_access_key_id" {
+  type = string
+}
+
+variable "aws_secret_access_key" {
+  type = string
+}
+
+variable "source_ami" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_id" {
+  type = string
+}
+
 source "amazon-ebs" "app-image" {
   ami_name      = "my-webapp-ami-{{timestamp}}"
   instance_type = var.instance_type
   region        = var.aws_region
 
   # Specify the exact AMI ID here
-  source_ami    = "ami-0866a3c8686eaeeba"  # Replace with your actual AMI ID
+  source_ami = "ami-0866a3c8686eaeeba" # Replace with your actual AMI ID
 
-  ssh_username  = var.ssh_username
+  ssh_username = var.ssh_username
 
   # Specify VPC and subnet
-  vpc_id       = "vpc-0f2850e40f574343c"    # Replace with your actual VPC ID
-  subnet_id    = "subnet-00182ea6332d20830" # Replace with your actual Subnet ID
+  vpc_id    = var.vpc_id    # Replace with your actual VPC ID
+  subnet_id = var.subnet_id # Replace with your actual Subnet ID
 }
 
 
@@ -60,7 +80,7 @@ build {
   sources = ["source.amazon-ebs.app-image"]
 
   provisioner "file" {
-    source      = "./webapp.zip"
+    source      = "../webapp.zip"
     destination = "/tmp/webapp.zip"
   }
 
