@@ -62,5 +62,6 @@ jobs:
           -var 'source_ami=${{ vars.SOURCE_AMI }}' \
           -var 'ssh_username=${{ vars.SSH_USERNAME }}' \
           -var 'aws_region=${{ vars.AWS_REGION }}' \
-          -var 'subnet_id=${{ vars.DEFAULT_SUBNET_ID }}' \
+          -var 'subnet_id=${{ vars.SUBNET_ID }}' \
+          -var 'vpc_id=${{ vars.VPC_ID }}' \
           aws.pkr.hcl

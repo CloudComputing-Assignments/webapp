@@ -39,6 +39,26 @@ variable "DB_PASSWORD" {
   type = string
 }
 
+variable "aws_access_key_id" {
+  type = string
+}
+
+variable "aws_secret_access_key" {
+  type = string
+}
+
+variable "source_ami" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_id" {
+  type = string
+}
+
 source "amazon-ebs" "app-image" {
   ami_name      = "my-webapp-ami-{{timestamp}}"
   instance_type = var.instance_type
@@ -50,8 +70,8 @@ source "amazon-ebs" "app-image" {
   ssh_username = var.ssh_username
 
   # Specify VPC and subnet
-  vpc_id    = "vpc-0f2850e40f574343c"    # Replace with your actual VPC ID
-  subnet_id = "subnet-00182ea6332d20830" # Replace with your actual Subnet ID
+  vpc_id    = var.vpc_id   # Replace with your actual VPC ID
+  subnet_id = var.subnet_id # Replace with your actual Subnet ID
 }
 
 
