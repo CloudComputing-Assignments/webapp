@@ -70,7 +70,7 @@ source "amazon-ebs" "app-image" {
   ssh_username = var.ssh_username
 
   # Specify VPC and subnet
-  vpc_id    = var.vpc_id   # Replace with your actual VPC ID
+  vpc_id    = var.vpc_id    # Replace with your actual VPC ID
   subnet_id = var.subnet_id # Replace with your actual Subnet ID
 }
 
