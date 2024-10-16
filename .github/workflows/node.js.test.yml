@@ -1,9 +1,10 @@
 name: Node.js CI with MySQL
 env:
-  DB_USERNAME: ${{ secrets.NEW_DB_USERNAME }}  # Set DB_USERNAME from new secret
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}  # Set DB_USERNAME from new secret
   DB_DATABASE: ${{ secrets.DB_DATABASE }}      # Existing database secret
-  DB_PASSWORD: ${{ secrets.NEW_DB_PASSWORD }}  # Set new password secret
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}  # Set new password secret
   DB_HOST: ${{ secrets.DB_HOST }}               # Existing host secret
+
 
 on:
   pull_request:
@@ -21,7 +22,7 @@ jobs:
 
       - name: Connect to MySQL and create database
         run: |
-          sudo mysql --user="${{ secrets.NEW_DB_USERNAME }}" --password="${{ secrets.NEW_DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
+          sudo mysql --user='${{ secrets.DB_USERNAME }}' --password='${{ secrets.DB_PASSWORD }}' -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
 
       - name: Check Node.js and npm versions
         run: |
@@ -38,3 +39,6 @@ jobs:
       - name: Run tests
         run: |
           npm test
+
+
+          
