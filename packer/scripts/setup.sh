@@ -57,4 +57,3 @@ else
     echo "Failed to flush privileges."
     exit 1
 fi
-
