@@ -30,7 +30,9 @@ jobs:
         uses: montudor/action-zip@v1
         with:
           args: zip -r webapp.zip ./
-            ls -al
+    
+      - name: List files after zipping
+        run: ls -alh
 
       - name: Delete copied files
         run: rm -rf webapp && ls -R
