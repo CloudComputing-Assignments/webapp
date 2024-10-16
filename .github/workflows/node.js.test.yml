@@ -22,7 +22,9 @@ jobs:
 
       - name: Connect to MySQL and create database
         run: |
-          sudo mysql --user=root --execute="CREATE USER IF NOT EXISTS ${{ secrets.ALT_DB_USERNAME }} --password=${{ secrets.ALT_DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
+          sudo mysql --user=root --execute="
+          CREATE USER IF NOT EXISTS '${{ secrets.ALT_DB_USERNAME }}'@'localhost' IDENTIFIED BY '${{ secrets.ALT_DB_PASSWORD }}';
+          CREATE DATABASE IF NOT EXISTS '${{ secrets.DB_DATABASE }}';"
 
       - name: Check Node.js and npm versions
         run: |
