@@ -1,9 +1,9 @@
 name: Node.js CI with MySQL
 env:
-  DB_USERNAME: ${{ secrets.ALT_DB_USERNAME }}
-  DB_DATABASE: ${{ secrets.DB_DATABASE }}
-  DB_PASSWORD: ${{ secrets.ALT_DB_PASSWORD }}
-  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_USERNAME: ${{ secrets.NEW_DB_USERNAME }}  # Set DB_USERNAME from new secret
+  DB_DATABASE: ${{ secrets.DB_DATABASE }}      # Existing database secret
+  DB_PASSWORD: ${{ secrets.NEW_DB_PASSWORD }}  # Set new password secret
+  DB_HOST: ${{ secrets.DB_HOST }}               # Existing host secret
 
 on:
   pull_request:
@@ -14,20 +14,21 @@ jobs:
     name: Node.JS CI
     runs-on: ubuntu-latest
     steps:
-      - name: Install  and start MySQL
+      - name: Install and start MySQL
         run: |
-          # sudo apt-get update
           sudo apt-get install -y mysql-server
           sudo systemctl start mysql.service
 
       - name: Connect to MySQL and create database
         run: |
-          sudo mysql --user=${{ secrets.ALT_DB_USERNAME }} --password=${{ secrets.ALT_DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
+          # Using the DB_USERNAME variable for MySQL connection
+          sudo mysql --user=${{ env.DB_USERNAME }} --password=${{ env.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
 
       - name: Check Node.js and npm versions
         run: |
           node --version
           npm --version
+
       - name: Checkout code
         uses: actions/checkout@v3
 
