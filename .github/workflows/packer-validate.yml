@@ -58,6 +58,7 @@ jobs:
       - name: Run `packer validate`
         id: validate
         run: |
+          cd packer/ &&
           packer validate \ 
           -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
           -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
@@ -72,4 +73,4 @@ jobs:
           -var 'aws_region=${{ vars.AWS_REGION }}' \
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'vpc_id=${{ vars.VPC_ID }}' \
-          ./packer/aws.pkr.hcl
+          aws.pkr.hcl
