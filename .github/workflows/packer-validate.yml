@@ -11,6 +11,7 @@ on:
 
 jobs:
   packer:
+    name: Packer validate
     runs-on: ubuntu-latest
 
     strategy:
@@ -60,6 +61,7 @@ jobs:
           -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
           -var 'DB_PORT=${{ secrets.DB_PORT }}' \
           -var 'source_ami=${{ vars.SOURCE_AMI }}' \
+          -var 'instance_type=${{ vars.INSTANCE_TYPE }}'
           -var 'ssh_username=${{ vars.SSH_USERNAME }}' \
           -var 'aws_region=${{ vars.AWS_REGION }}' \
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
