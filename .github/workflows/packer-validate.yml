@@ -1,0 +1,66 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Packer validate CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Copy all files
+        run: rsync -arv --exclude='.git/' --exclude='.github/' --exclude='.gitignore' . ./webapp && ls -R
+
+      - name: Zip file
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -r webapp.zip webapp/
+
+      - name: Delete copied files
+        run: rm -rf webapp && ls -R
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: "latest"
+
+      - name: Run `packer init`
+        id: init
+        run: packer init ./packer/aws.pkr.hcl
+
+      - name: Run `packer fmt` and check for changes
+        id: format
+        run: |
+          packer fmt -check -diff ./packer/aws.pkr.hcl || exit 1
+
+      - name: Run `packer validate`
+        id: validate
+        run: |
+          cd packer/ &&
+          packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+          -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
+          -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
+          -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
+          -var 'DB_HOST=${{ secrets.DB_HOST }}' \
+          -var 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' \
+          -var 'DB_PORT=${{ secrets.DB_PORT }}' \
+          -var 'source_ami=${{ vars.SOURCE_AMI }}' \
+          -var 'ssh_username=${{ vars.SSH_USERNAME }}' \
+          -var 'aws_region=${{ vars.AWS_REGION }}' \
+          -var 'subnet_id=${{ vars.DEFAULT_SUBNET_ID }}' \
+          aws.pkr.hcl
