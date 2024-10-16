@@ -21,8 +21,7 @@ jobs:
 
       - name: Connect to MySQL and create database
         run: |
-          # Using the DB_USERNAME variable for MySQL connection
-          sudo mysql --user=${{ secrets.NEW_DB_USERNAME }} --password=${{ secrets.NEW_DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
+          sudo mysql --user="${{ secrets.NEW_DB_USERNAME }}" --password="${{ secrets.NEW_DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
 
       - name: Check Node.js and npm versions
         run: |
