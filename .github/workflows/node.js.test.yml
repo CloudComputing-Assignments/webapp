@@ -1,8 +1,8 @@
 name: Node.js CI with MySQL
 env:
-  DB_USERNAME: ${{ secrets.ALT_DB_USERNAME }}
+  DB_USERNAME: ${{ secrets.NEW_USERNAME }}
   DB_DATABASE: ${{ secrets.DB_DATABASE }}
-  DB_PASSWORD: ${{ secrets.ALT_DB_PASSWORD }}
+  DB_PASSWORD: ${{ secrets.NEW_PASSWORD }}
   DB_HOST: ${{ secrets.DB_HOST }}
 
 on:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Connect to MySQL and create database
         run: |
-          sudo mysql --user=${{ secrets.ALT_DB_USERNAME }} --password=${{ secrets.ALT_DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
+          sudo mysql --user=${{ secrets.NEW_USERNAME }} --password=${{ secrets.NEW_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_DATABASE }};"
 
       - name: Check Node.js and npm versions
         run: |
