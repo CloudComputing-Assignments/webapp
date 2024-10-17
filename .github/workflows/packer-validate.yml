@@ -70,5 +70,5 @@ jobs:
           -var 'aws_region=${{ vars.AWS_REGION }}' \
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'vpc_id=${{ vars.VPC_ID }}' \
-          -var 'ami_users=${{ vars.AMI_USERS }}'
+          -var 'ami_users=${{ vars.AMI_USERS }}' \
           aws.pkr.hcl
