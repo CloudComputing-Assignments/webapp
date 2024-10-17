@@ -107,10 +107,10 @@ build {
       "DB_PORT=${var.DB_PORT}",
     ]
     scripts = [
-      "scripts/create-user.sh",
-      "scripts/setup.sh",
-      "scripts/app-setup.sh",
-      "scripts/systemd.sh"
+      "./scripts/create-user.sh",
+      "./scripts/setup.sh",
+      "./scripts/app-setup.sh",
+      "./scripts/systemd.sh"
     ]
   }
 }
