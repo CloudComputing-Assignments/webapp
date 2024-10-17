@@ -90,7 +90,7 @@ jobs:
       - name: Run `packer validate`
         id: validate
         run: |
-          cd packer/ &&
+          cd packer/ && ls -l &&
           packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
           -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
@@ -110,8 +110,8 @@ jobs:
       - name: Run `packer build`
         id: build
         run: |
-            cd packer/ &&
-            packer build -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+            cd packer/ && ls -l &&
+            packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
             -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
             -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
             -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
