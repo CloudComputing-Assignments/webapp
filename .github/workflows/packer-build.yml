@@ -75,7 +75,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}  
 
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main
@@ -86,6 +86,11 @@ jobs:
       - name: Run `packer init`
         id: init
         run: packer init ./packer/aws.pkr.hcl
+
+      - name: Run `packer fmt` and check for changes
+        id: format
+        run: |
+          packer fmt -check -diff ./packer/aws.pkr.hcl || exit 1
 
       - name: Run `packer validate`
         id: validate
@@ -111,7 +116,7 @@ jobs:
         id: build
         run: |
             cd packer/ && ls -l &&
-            packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+            packer build -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
             -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
             -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
             -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
