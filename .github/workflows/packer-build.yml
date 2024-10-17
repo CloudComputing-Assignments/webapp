@@ -50,7 +50,13 @@ jobs:
 
       - name: Run tests
         run: |
-          npm test
+            echo "Starting tests..."
+            npm test || {
+              echo "Tests failed. Here are the logs:";
+              npm test -- --verbose;  # Add verbose logging for more details
+              exit 1;  # Exit with an error code
+            }
+        
 
       - name: Setup `awscli`
         uses: aws-actions/configure-aws-credentials@v1
