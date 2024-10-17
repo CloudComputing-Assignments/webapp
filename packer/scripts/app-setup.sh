@@ -36,17 +36,16 @@ sudo npm install bcrypt
 
 # Create .env file in the webapp folder
 echo "Creating .env file"
-cat <<EOT > /home/csye6225/webapp/.env
+sudo bash -c "cat <<EOT > /home/csye6225/webapp/.env
 DB_HOST=$DB_HOST
 DB_USERNAME=$DB_USERNAME
 DB_PASSWORD=$DB_PASSWORD
 DB_DATABASE=$DB_DATABASE
 PORT=$DB_PORT
 NODE_ENV=production
-EOT
+EOT"
 
 # Change ownership and permissions for the .env file
 sudo chown csye6225:csye6225 /home/csye6225/webapp/.env
 sudo chmod 600 /home/csye6225/webapp/.env  # Read/write only by owner
-
 echo "Node.js application setup complete."
