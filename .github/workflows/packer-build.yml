@@ -95,7 +95,7 @@ jobs:
       - name: Run `packer validate`
         id: validate
         run: |
-          cd packer/ && ls -l &&
+          ls -l &&
           packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
           -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
@@ -110,12 +110,12 @@ jobs:
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'vpc_id=${{ vars.VPC_ID }}' \
           -var 'ami_users=${{ vars.AMI_USERS }}' \
-          aws.pkr.hcl
+          ./packer/aws.pkr.hcl
 
       - name: Run `packer build`
         id: build
         run: |
-            cd packer/ && ls -l &&
+            ls -l &&
             packer build -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
             -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
             -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
@@ -130,7 +130,7 @@ jobs:
             -var 'subnet_id=${{ vars.SUBNET_ID }}' \
             -var 'vpc_id=${{ vars.VPC_ID }}' \
             -var 'ami_users=${{ vars.AMI_USERS }}' \
-            aws.pkr.hcl
+            ./packer/aws.pkr.hcl
 
       - name: Output AMI ID
         id: output
