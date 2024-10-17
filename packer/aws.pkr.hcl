@@ -89,12 +89,12 @@ build {
   sources = ["source.amazon-ebs.app-image"]
 
   provisioner "file" {
-    source      = "./webapp.zip"
+    source      = "../webapp.zip"
     destination = "/tmp/webapp.zip"
   }
 
   provisioner "file" {
-    source      = "./packer/webapp.service"
+    source      = "./webapp.service"
     destination = "/tmp/webapp.service"
   }
 
@@ -107,10 +107,10 @@ build {
       "DB_PORT=${var.DB_PORT}",
     ]
     scripts = [
-      "./packer/scripts/create-user.sh",
-      "./packer/scripts/setup.sh",
-      "./packer/scripts/app-setup.sh",
-      "./packer/scripts/systemd.sh"
+      "./scripts/create-user.sh",
+      "./scripts/setup.sh",
+      "./scripts/app-setup.sh",
+      "./scripts/systemd.sh"
     ]
   }
 }
