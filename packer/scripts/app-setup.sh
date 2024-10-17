@@ -21,7 +21,7 @@ sudo unzip webapp.zip -d .
 # Change ownership and permissions for the application files
 echo "Changing Permissions"
 sudo chown -R csye6225:csye6225 /home/csye6225/webapp
-sudo chmod 500 /home/csye6225/webapp/index.js  # Restrict execution permission to the owner
+# sudo chmod 500 /home/csye6225/webapp/index.js  # Restrict execution permission to the owner
 
 # Remove the zip file
 echo "Removing the zip file"
