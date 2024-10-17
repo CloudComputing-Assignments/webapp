@@ -94,7 +94,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "./webapp.service"
+    source      = "./packer/webapp.service"
     destination = "/tmp/webapp.service"
   }
 
@@ -107,10 +107,10 @@ build {
       "DB_PORT=${var.DB_PORT}",
     ]
     scripts = [
-      "./scripts/create-user.sh",
-      "./scripts/setup.sh",
-      "./scripts/app-setup.sh",
-      "./scripts/systemd.sh"
+      "./packer/scripts/create-user.sh",
+      "./packer/scripts/setup.sh",
+      "./packer/scripts/app-setup.sh",
+      "./packer/scripts/systemd.sh"
     ]
   }
 }
