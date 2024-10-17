@@ -110,7 +110,7 @@ jobs:
           -var 'subnet_id=${{ vars.SUBNET_ID }}' \
           -var 'vpc_id=${{ vars.VPC_ID }}' \
           -var 'ami_users=${{ vars.AMI_USERS }}' \
-          /packer/aws.pkr.hcl
+          ./packer/aws.pkr.hcl
 
       - name: Run `packer build`
         id: build
@@ -130,7 +130,7 @@ jobs:
             -var 'subnet_id=${{ vars.SUBNET_ID }}' \
             -var 'vpc_id=${{ vars.VPC_ID }}' \
             -var 'ami_users=${{ vars.AMI_USERS }}' \
-            /packer/aws.pkr.hcl
+            ./packer/aws.pkr.hcl
 
       - name: Output AMI ID
         id: output
