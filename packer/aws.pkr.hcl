@@ -59,19 +59,28 @@ variable "subnet_id" {
   type = string
 }
 
+variable "ami_users" {
+  type    = list(string)
+  default = []
+}
+
 source "amazon-ebs" "app-image" {
   ami_name      = "my-webapp-ami-{{timestamp}}"
   instance_type = var.instance_type
   region        = var.aws_region
+  access_key    = var.aws_access_key_id
+  secret_key    = var.aws_secret_access_key
 
   # Specify the exact AMI ID here
-  source_ami = "ami-0866a3c8686eaeeba" # Replace with your actual AMI ID
+  source_ami = var.source_ami # Replace with your actual AMI ID
 
   ssh_username = var.ssh_username
 
   # Specify VPC and subnet
   vpc_id    = var.vpc_id    # Replace with your actual VPC ID
   subnet_id = var.subnet_id # Replace with your actual Subnet ID
+
+  ami_users = var.ami_users
 }
 
 
