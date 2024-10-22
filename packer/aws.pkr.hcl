@@ -65,7 +65,7 @@ variable "ami_users" {
 }
 
 source "amazon-ebs" "app-image" {
-    webfvuiewami_name      = "my-webapp-ami-{{timestamp}}"
+  ami_name      = "my-webapp-ami-{{timestamp}}"
   instance_type = var.instance_type
   region        = var.aws_region
   access_key    = var.aws_access_key_id
