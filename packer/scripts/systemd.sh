@@ -16,15 +16,15 @@ sudo sed -i 's/^SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 sudo sed -i 's/^SELINUX=permissive/SELINUX=disabled/g' /etc/selinux/config
 sudo setenforce 0
 
-# Enable and start the service
-echo "Enabling webapp service to start on boot..."
-sudo systemctl enable webapp.service
+# # Enable and start the service
+# echo "Enabling webapp service to start on boot..."
+# sudo systemctl enable webapp.service
 
-echo "Starting webapp service..."
-sudo systemctl start webapp.service
+# echo "Starting webapp service..."
+# sudo systemctl start webapp.service
 
-# Check the status of the service
-echo "Checking the status of webapp service..."
-sudo systemctl status webapp.service
+# # Check the status of the service
+# echo "Checking the status of webapp service..."
+# sudo systemctl status webapp.service
 
 echo "Systemd service setup complete."
