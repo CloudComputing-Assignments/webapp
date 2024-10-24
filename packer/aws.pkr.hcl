@@ -99,13 +99,6 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "DB_DATABASE=${var.DB_DATABASE}",
-      "DB_USERNAME=${var.DB_USERNAME}",
-      "DB_PASSWORD=${var.DB_PASSWORD}",
-      "DB_HOST=${var.DB_HOST}",
-      "DB_PORT=${var.DB_PORT}",
-    ]
     scripts = [
       "./packer/scripts/create-user.sh",
       "./packer/scripts/setup.sh",
