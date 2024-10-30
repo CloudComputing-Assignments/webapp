@@ -6,6 +6,9 @@ const app = express();
 const port = 3000;
 const { handleSyntaxError } = require('./middleware/middleware');
 const { sequelize } = require('./config/config'); // Adjust the path as necessary
+const imageRouter = require('./routes/imageRouter');
+const { User } = require('./model/User');
+
 
 sequelize.sync({ force: false })
   .catch((error) => {

@@ -87,9 +87,30 @@ async function createUser(req, res) {
 
   try {
     const isDatabaseConnected = await healthzService.checkDatabaseConnection();
+    if (!isDatabaseConnected) {
+      return res
+        .status(503)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send();
+    }
   } catch (error) {
     console.error("Error checking database connection:", error);
-    return res.status(503).header("Cache-Control", "no-cache").send();
+    return res
+      .status(503)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send();
   }
   try {
     if (Object.keys(req.body).length !== 4) {

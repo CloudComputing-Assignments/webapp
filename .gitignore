@@ -27,6 +27,8 @@ coverage
 build/Release
 
 # Dependency directories
+.vscode/
+routes/uploads/
 node_modules/
 jspm_packages/
 bower_components/
