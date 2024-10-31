@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# packer recommended - wait for ec2 instance to fully setup
+sleep 30
+
 echo "Starting application setup..."
 
 # Creating the application directory and adjusting permissions

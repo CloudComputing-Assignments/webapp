@@ -43,8 +43,11 @@ const deleteImagesFromS3 = async (userId) => {
     Prefix: prefix,
   };
 
+  console.log("List Params: ", listParams);
+
   try {
     const listedObjects = await s3.listObjectsV2(listParams).promise();
+    console.log("Listed Objects: ", listedObjects);
 
     if (listedObjects.Contents.length === 0) {
       console.log(`No images found for user: ${userId}`);
@@ -58,6 +61,8 @@ const deleteImagesFromS3 = async (userId) => {
         Objects: listedObjects.Contents.map(({ Key }) => ({ Key })), // Map the keys of the objects to delete
       },
     };
+    console.log(deleteParams.Delete.Objects);
+    console.log("Delete Params: ", deleteParams);
 
     // Delete the objects from the S3 bucket
     await s3.deleteObjects(deleteParams).promise();

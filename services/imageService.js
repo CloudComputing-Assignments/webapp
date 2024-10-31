@@ -1,6 +1,7 @@
 const Image = require("../model/Image");
 const User = require("../model/User");
 const { getUser } = require("./userService"); // Importing getUser from UserService
+const client = require("../util/statsD");
 const multer = require("multer");
 const upload = multer({
   dest: __dirname + "/upload",
@@ -9,6 +10,7 @@ const upload = multer({
 // Create a new image for the authenticated user
 async function createImage(userId, req, url) {
   // Check if the user already has an image
+  const startTime = Date.now();
   const existingImage = await Image.findOne({ where: { user_id: userId } });
   if (existingImage) {
     throw new Error(
@@ -23,12 +25,16 @@ async function createImage(userId, req, url) {
     user_id: userId,
   });
 
+  const duration = Date.now() - startTime;
+  client.timing("post.imagedb.duration", duration);
+
   return newImage;
 }
 
 // Delete the user's image
 async function deleteImage(userId) {
   // Find the existing image associated with the user
+  const startTime = Date.now();
   const image = await Image.findOne({ where: { user_id: userId } });
   if (!image) {
     return false;
@@ -40,18 +46,24 @@ async function deleteImage(userId) {
     return true;
   } catch {
     throw new Error("Image could not be deleted.");
+  } finally {
+    const duration = Date.now() - startTime;
+    client.timing("delete.imagedb.duration", duration);
   }
 }
 
 // Get the user's image
 async function getImage(req) {
   // Get the authenticated user
-
+  const startTime = Date.now();
   // Find the existing image associated with the user
   const image = await Image.findOne({ where: { user_id: req.user.id } });
   if (!image) {
     return null;
   }
+
+  const duration = Date.now() - startTime;
+  client.timing("get.imagedb.duration", duration);
 
   return image;
 }

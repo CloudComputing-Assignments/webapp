@@ -98,12 +98,23 @@ build {
     destination = "/tmp/webapp.service"
   }
 
+  provisioner "file" {
+    source      = "./packer/cloudwatch-config.json"
+    destination = "/tmp/cloudwatch-config.json"
+  }
+
+  provisioner "file" {
+    source      = "./packer/csye6225.conf"
+    destination = "/tmp/csye6225.conf"
+  }
+
   provisioner "shell" {
     scripts = [
       "./packer/scripts/create-user.sh",
       "./packer/scripts/setup.sh",
       "./packer/scripts/app-setup.sh",
-      "./packer/scripts/systemd.sh"
+      "./packer/scripts/systemd.sh",
+      "./packer/scripts/cloudwatch.sh"
     ]
   }
 }

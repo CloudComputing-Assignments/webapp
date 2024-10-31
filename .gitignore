@@ -28,6 +28,7 @@ build/Release
 
 # Dependency directories
 .vscode/
+logs/
 routes/uploads/
 node_modules/
 jspm_packages/
