@@ -128,16 +128,13 @@ async function updateUser(
 }
 
 async function verifyUser(token) {
-    console.log("Token from service:", token);
     if (!token) {
       return { success: false, message: "Verification token is missing" };
     }
   
     try {
-      console.log("Inside try block");
   
       const user = await User.findOne({ where: { verification_token: token } });
-      console.log("User found:", user);
   
       if (!user) {
         return { success: false, message: "Invalid token or user not found" };
