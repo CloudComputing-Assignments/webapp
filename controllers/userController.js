@@ -1,6 +1,8 @@
 const userService = require("../services/userService");
 const healthzService = require("../services/healthzService");
 const client = require("../util/statsD");
+const AWS = require('aws-sdk');
+const sns = new AWS.SNS();
 
 async function getUser(req, res) {
   client.increment("get.user.fetch");
@@ -157,6 +159,27 @@ async function createUser(req, res) {
       email
     );
 
+    // Publish SNS message with verification token
+    const snsMessage = {
+      id: newUser.id,
+      email: newUser.email,
+      verification_token: newUser.verification_token,
+      timestamp: newUser.timestamp.toISOString(),
+      expTimestamp: newUser.expTimestamp.toISOString(),
+    };
+
+    const publishParams = {
+      Message: JSON.stringify(snsMessage),
+      TopicArn: process.env.SNS_TOPIC_ARN, // Ensure this environment variable is set
+    };
+
+    try {
+      const snsResponse = await sns.publish(publishParams).promise();
+      console.log("SNS message published:", snsResponse);
+    } catch (snsError) {
+      console.error("Failed to publish SNS message:", snsError);
+    }
+
     const responseObject = {
       id: newUser.id,
       first_name: newUser.first_name,
@@ -278,6 +301,93 @@ async function updateUser(req, res) {
   }
 }
 
+async function verifyUser(req, res) {
+  client.increment("get.user.verify");
+  const startTime = Date.now();
+
+  try {
+    // Validate token presence
+    const { token } = req.query;
+    console.log("Token from controller:", token);
+    
+    if (!token) {
+      return res
+        .status(400)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send({ error: "Verification token is required" });
+    }
+
+    try {
+      // Verify the user using the service
+      const verificationResult = await userService.verifyUser(token);
+
+      // If verification fails, return the error message
+      if (!verificationResult.success) {
+        return res
+          .status(400)
+          .set({
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-cache",
+          })
+          .send({ error: verificationResult.message });
+      }
+
+      // Success response
+      return res
+        .status(200)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send({ message: verificationResult.message });
+    } catch (error) {
+      // Log and handle unexpected errors during user verification
+      console.error("Error verifying user:", error);
+      return res
+        .status(500)
+        .set({
+          "Access-Control-Allow-Credentials": "true",
+          "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+          "Access-Control-Allow-Methods": "*",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        })
+        .send({ error: "An error occurred while verifying the user" });
+    } finally {
+      // Record the execution time for monitoring
+      const duration = Date.now() - startTime;
+      client.timing("get.user.verify.duration", duration);
+    }
+  } catch (error) {
+    // General error handling if any unexpected issue occurs outside the try blocks
+    console.error("Unexpected error in verifyUser:", error);
+    return res
+      .status(500)
+      .set({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Origin",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache",
+      })
+      .send({ error: "An unexpected error occurred" });
+  }
+}
+
+    
+
 // Function to validate request body
 function validateRequestBody(body) {
   const allowedFields = ["first_name", "last_name", "password", "email"];
@@ -304,4 +414,4 @@ function validateRequestBody(body) {
   return { isValid: true };
 }
 
-module.exports = { getUser, createUser, updateUser };
+module.exports = { getUser, createUser, updateUser, verifyUser };

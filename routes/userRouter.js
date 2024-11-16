@@ -19,11 +19,13 @@ userRouter.get("/self", authenticateUser, userController.getUser);
 userRouter.put("/self", authenticateUser, userController.updateUser);
 userRouter.use("/self/pic", imageRouter);
 userRouter.post("/", userController.createUser);
+userRouter.get("/verify", userController.verifyUser);
 
 // Handle unsupported methods for defined routes
 const allowedMethods = {
   "/self": ["GET", "PUT"],
   "/": ["POST"],
+  "/verify": ["GET"],
 };
 
 userRouter.use((req, res, next) => {
