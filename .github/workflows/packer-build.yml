@@ -131,7 +131,7 @@ jobs:
 
             # Extract AMI ID from packer output
             AMI_ID=$(grep 'artifact,0,id' build.log | cut -d, -f6 | cut -d: -f2)
-            if [ -z "$AMI_ID" ]; then
+            if [ -z "$AMI" ]; then
               echo "Error: AMI ID not found in packer output."
               exit 1
             fi
