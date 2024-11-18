@@ -59,6 +59,23 @@ const User = sequelize.define(
         notEmpty: true,
       },
     },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    verification_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
+    },
+    timestamp:{
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    expTimestamp:{
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     account_created: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

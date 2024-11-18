@@ -70,8 +70,8 @@ jobs:
       - name: Setup `awscli`
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}  
 
       - name: Setup `packer`
@@ -127,9 +127,82 @@ jobs:
             -var 'subnet_id=${{ vars.SUBNET_ID }}' \
             -var 'vpc_id=${{ vars.VPC_ID }}' \
             -var 'ami_users=${{ vars.AMI_USERS }}' \
-            ./packer/aws.pkr.hcl
+            ./packer/aws.pkr.hcl | tee build.log
+
+            # Extract AMI ID from packer output
+            AMI_ID=$(grep -oP 'artifact,0,id,ami-\K[a-zA-Z0-9]+' build.log)
+            if [ -z "$AMI_ID" ]; then
+              echo "Error: AMI ID not found in packer output."
+              exit 1
+            fi
+            echo "AMI ID: $AMI_ID"
+            echo "ami_id=$AMI_ID" >> $GITHUB_ENV
 
       - name: Output AMI ID
         id: output
         run: |
-          echo "AMI ID: ${{ steps.build.outputs.ami_id }}"
+          echo "Using AMI ID: ${{ env.ami_id }}"
+      
+      - name: Setup `awscli`
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            aws-access-key-id: ${{ secrets.AWS_DEMO_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_DEMO_SECRET_ACCESS_KEY }}
+            aws-region: ${{ vars.AWS_REGION }}
+    
+        # [NEW] Create a new Launch Template version with the latest AMI
+      - name: Create a new Launch Template version
+        id: create_launch_template_version
+        run: |
+          aws ec2 create-launch-template-version \
+            --launch-template-id "${{ vars.LAUNCH_TEMPLATE_ID }}" \
+            --version-description "New version with AMI ID ${{ env.ami_id }}" \
+            --source-version $LATEST \
+            --launch-template-data "{\"ImageId\": \"${{ env.ami_id }}\"}" \
+            --output json > new_launch_template_version.json
+    
+          # Extract the new version number
+          NEW_VERSION=$(jq -r '.LaunchTemplateVersion.VersionNumber' new_launch_template_version.json)
+          echo "New Launch Template Version: $NEW_VERSION"
+          echo "new_launch_template_version=$NEW_VERSION" >> $GITHUB_ENV
+    
+        # [NEW] Update Auto Scaling group to use the new Launch Template version
+      - name: Update Auto Scaling Group
+        id: update_asg
+        run: |
+          aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name "${{ vars.AUTOSCALING_GROUP_NAME }}" \
+            --launch-template "LaunchTemplateId=${{ vars.LAUNCH_TEMPLATE_ID }},Version=${{ env.new_launch_template_version }}" \
+            --output json
+    
+      # [NEW] Start Instance Refresh
+      - name: Start Instance Refresh
+        id: start_instance_refresh
+        run: |
+          REFRESH_ID=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name "${{ vars.AUTOSCALING_GROUP_NAME }}" \
+            --output json | jq -r '.InstanceRefreshId')
+    
+          echo "Instance Refresh ID: $REFRESH_ID"
+          echo "instance_refresh_id=$REFRESH_ID" >> $GITHUB_ENV
+    
+        # [NEW] Wait for Instance Refresh to complete
+      - name: Wait for Instance Refresh
+        id: wait_for_refresh
+        run: |
+          STATUS="InProgress"
+          while [ "$STATUS" == "InProgress" ]; do
+            echo "Waiting for Instance Refresh to complete..."
+            sleep 30
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "${{ vars.AUTOSCALING_GROUP_NAME }}" \
+              --instance-refresh-ids "${{ env.instance_refresh_id }}" \
+              --output json | jq -r '.InstanceRefreshes[0].Status')
+            echo "Current status: $STATUS"
+          done
+    
+          if [ "$STATUS" != "Successful" ]; then
+            echo "Instance Refresh failed with status: $STATUS"
+            exit 1
+          fi
+          echo "Instance Refresh completed successfully."
