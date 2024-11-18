@@ -113,8 +113,8 @@ jobs:
         id: build
         run: |
             ls -l &&
-            packer build -var 'aws_access_key_id=${{ secrets.AWS_DEV_ACCESS_KEY_ID }}' \
-            -var 'aws_secret_access_key=${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}' \
+            packer build -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+            -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
             -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
             -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
             -var 'DB_HOST=${{ secrets.DB_HOST }}' \
@@ -130,7 +130,7 @@ jobs:
             ./packer/aws.pkr.hcl | tee build.log
 
             # Extract AMI ID from packer output
-            AMI_ID=$(grep -oP 'artifact,0,id,ami-\K[a-zA-Z0-9]+' build.log)
+            AMI_ID=$(grep 'artifact,0,id' build.log | cut -d, -f6 | cut -d: -f2)
             if [ -z "$AMI_ID" ]; then
               echo "Error: AMI ID not found in packer output."
               exit 1
