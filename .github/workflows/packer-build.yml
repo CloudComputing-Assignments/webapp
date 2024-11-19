@@ -93,8 +93,8 @@ jobs:
         id: validate
         run: |
           ls -l &&
-          packer validate -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
-          -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
+          packer validate -var 'aws_access_key_id=${{ secrets.AWS_DEV_ACCESS_KEY_ID }}' \
+          -var 'aws_secret_access_key=${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}' \
           -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
           -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
           -var 'DB_HOST=${{ secrets.DB_HOST }}' \
@@ -113,8 +113,8 @@ jobs:
         id: build
         run: |
             ls -l &&
-            packer build -var 'aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}' \
-            -var 'aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
+            packer build -var 'aws_access_key_id=${{ secrets.AWS_DEV_ACCESS_KEY_ID }}' \
+            -var 'aws_secret_access_key=${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}' \
             -var 'DB_USERNAME=${{ secrets.DB_USERNAME }}' \
             -var 'DB_DATABASE=${{ secrets.DB_DATABASE }}' \
             -var 'DB_HOST=${{ secrets.DB_HOST }}' \
