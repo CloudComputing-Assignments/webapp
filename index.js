@@ -7,6 +7,7 @@ const port = 3000;
 const { handleSyntaxError } = require('./middleware/middleware');
 const { sequelize } = require('./config/config'); // Adjust the path as necessary
 const imageRouter = require('./routes/imageRouter');
+const newRouter = require('./routes/newRouter');
 const { User } = require('./model/User');
 
 
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/healthz', healthzRouter);
+app.use('/cicd', newRouter);
 app.use('/v1/user', userRouter);
 
 // Error handler for malformed JSON (or any syntax error)
